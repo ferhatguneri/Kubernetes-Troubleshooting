@@ -10,26 +10,3 @@ $ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
 $ kubeadm alpha certs renew all 
 
 
-İf your certificate expired and your kubelet service does not working you can renew it by following commands. But first let's check how we can see the error.
-
-$ journalctl
-
-You will see below logs end of file
-
-Kas 12 09:07:15 Server systemd[1]: Started Kubernetes systemd probe.
-Kas 12 09:07:15 Server kubelet[12711]: I1112 09:07:15.020814   12711 server.go:408] Version: v1.11.2
-Kas 12 09:07:15 Server kubelet[12711]: I1112 09:07:15.021195   12711 plugins.go:97] No cloud provider specified.
-Kas 12 09:07:15 Server kubelet[12711]: E1112 09:07:15.023868   12711 bootstrap.go:195] Part of the existing bootstrap client certificate is expired: 2019-08-28 11:41:42 +0000 UTC
-Kas 12 09:07:15 Server kubelet[12711]: F1112 09:07:15.023943   12711 server.go:262] failed to run Kubelet: unable to load bootstrap kubeconfig: stat /etc/kubernetes/bootstrap-kubelet.conf: no such file or
-Kas 12 09:07:15 Server systemd[1]: kubelet.service: Main process exited, code=exited, status=255/n/a
-
-The solution is (first take a backup)
-$ cd /etc/kubernetes/pki/
-$ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
-$ kubeadm init phase certs all --apiserver-advertise-address <IP>
-$ cd /etc/kubernetes/
-$ mv {admin.conf,controller-manager.conf,mv kubelet.conf,scheduler.conf} ~/
-$ kubeadm init phase kubeconfig all
-$ reboot
-then
-$ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
