@@ -4,16 +4,17 @@ $ openssl x509 -in /etc/kubernetes/pki/apiserver.crt -noout -text |grep ' Not '
 
             Not Before: Aug 28 11:41:37 2018 GMT
             Not After : Aug 28 11:41:37 2019 GMT
-İf your certificate does not expired you can renew easily it by following command
+            
+İf your certificate does not expired you can renew it easily by following command
 
 $ kubeadm alpha certs renew all 
 
 
-İf your certificate expired and your kubelet service does not working you can renew it by following commands. But first let's check how we can see error.
+İf your certificate expired and your kubelet service does not working you can renew it by following commands. But first let's check how we can see the error.
 
 $ journalctl
 
-You will see below logs
+You will see below logs end of file
 
 Kas 12 09:07:15 Server systemd[1]: Started Kubernetes systemd probe.
 Kas 12 09:07:15 Server kubelet[12711]: I1112 09:07:15.020814   12711 server.go:408] Version: v1.11.2
@@ -22,7 +23,7 @@ Kas 12 09:07:15 Server kubelet[12711]: E1112 09:07:15.023868   12711 bootstrap.g
 Kas 12 09:07:15 Server kubelet[12711]: F1112 09:07:15.023943   12711 server.go:262] failed to run Kubelet: unable to load bootstrap kubeconfig: stat /etc/kubernetes/bootstrap-kubelet.conf: no such file or
 Kas 12 09:07:15 Server systemd[1]: kubelet.service: Main process exited, code=exited, status=255/n/a
 
-The solution is (first a backup)
+The solution is (first take a backup)
 $ cd /etc/kubernetes/pki/
 $ mv {apiserver.crt,apiserver-etcd-client.key,apiserver-kubelet-client.crt,front-proxy-ca.crt,front-proxy-client.crt,front-proxy-client.key,front-proxy-ca.key,apiserver-kubelet-client.key,apiserver.key,apiserver-etcd-client.crt} ~/
 $ kubeadm init phase certs all --apiserver-advertise-address <IP>
