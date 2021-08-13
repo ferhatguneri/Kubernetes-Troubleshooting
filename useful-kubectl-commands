@@ -1,0 +1,38 @@
+# Create new deployment yaml
+kubectl create deploy --image=nginx nginx --replicas=4 --dry-run=client -o yaml >deployment.yaml
+
+
+# Create new service yaml
+kubectl expose pod nginx --name nginx-service --port=80 --type=NodePort --dry-run=client -o yaml >service.yaml
+
+
+# Change replica count of all deployments in a specifis namespace
+kubectl get deploy -n live -o name | xargs -I % kubectl scale % --replicas=1 -n live
+
+
+# Scale all deployments which include "api" in deployment name
+kubectl get deploy -n live | awk '{print $1}' | grep api | xargs -I % kubectl scale deploy % --replicas=1 -n live
+
+
+Delete all pods in a specific namespace
+kubectl get pod -n live | awk '{print$1}' | xargs -I %  kubectl delete pod % -n live
+
+Delete specific pod grep by name
+kubectl get job | grep janitor | awk '{print $1}' | xargs kubectl delete job 
+
+Delete Evicted Pods in a specific namespace
+ns=live
+kubectl get pod -n $ns | grep Evicted | awk '{print $1}' | xargs kubectl delete pod -n $ns
+
+
+##### Change All Persistent volumes Claim Policy Delete to Retain 
+kubectl get pv | grep Delete | awk '{print$1}' | xargs -I %  kubectl patch pv % -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+
+
+
+Make Available Released Persistent Volume. To Reuse it again.
+kubectl patch pv NAME -p '{"spec":{"claimRef": null}}'
+
+
+Finalize Persistent Volme from kubernetes
+kubectl patch pv NAME -p '{"metadata":{"finalizers":null}}'
