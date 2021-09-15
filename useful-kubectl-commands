@@ -36,3 +36,15 @@ kubectl patch pv NAME -p '{"spec":{"claimRef": null}}'
 
 Finalize Persistent Volme from kubernetes
 kubectl patch pv NAME -p '{"metadata":{"finalizers":null}}'
+
+
+##### Search for pod status CrashLoopBackOff in all namespaces and delete it 
+kubectl delete pod `kubectl get pod -A | awk '$4 == "CrashLoopBackOff" {print $2 " -n " $1}'` 
+
+
+
+##### Search for pod status Error in all namespaces and delete it 
+kubectl delete pod `kubectl get pod -A | awk '$4 == "Error" {print $2 " -n " $1}'` 
+
+
+
