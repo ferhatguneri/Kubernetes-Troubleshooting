@@ -28,7 +28,8 @@ kubectl get pod -n $ns | grep Evicted | awk '{print $1}' | xargs kubectl delete 
 ##### Change All Persistent volumes Claim Policy Delete to Retain 
 kubectl get pv | grep Delete | awk '{print$1}' | xargs -I %  kubectl patch pv % -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
 
-
+### If a resource is immutable, replace command can be used to patch the resource
+kubectl patch clusteradmissionpolicy user-group-psp --type=merge -p '{"spec":{"mode": "monitor"}}' --dry-run=client -o yaml | kubectl replace -f - --force
 
 Make Available Released Persistent Volume. To Reuse it again.
 kubectl patch pv NAME -p '{"spec":{"claimRef": null}}'
@@ -45,6 +46,7 @@ kubectl delete pod `kubectl get pod -A | awk '$4 == "CrashLoopBackOff" {print $2
 
 ##### Search for pod status Error in all namespaces and delete it 
 kubectl delete pod `kubectl get pod -A | awk '$4 == "Error" {print $2 " -n " $1}'` 
+
 
 
 
