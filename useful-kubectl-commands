@@ -47,6 +47,10 @@ kubectl delete pod `kubectl get pod -A | awk '$4 == "CrashLoopBackOff" {print $2
 ##### Search for pod status Error in all namespaces and delete it 
 kubectl delete pod `kubectl get pod -A | awk '$4 == "Error" {print $2 " -n " $1}'` 
 
+### command to list down the deployment name, CPU requests, and memory requests in all namespaces:
+kubectl get deployments --all-namespaces -o custom-columns="NAMESPACE:.metadata.namespace,DEPLOYMENT:.metadata.name,CPU_REQUESTS:.spec.template.spec.containers[*].resources.requests.cpu,MEMORY_REQUESTS:.spec.template.spec.containers[*].resources.requests.memory" --no-headers
+
+
 
 
 
